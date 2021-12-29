@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../../../../../../../layout/compose-model-1639444651913.xml" value="0.30808080808080807" />
+        <entry key="../../../../../../../layout/compose-model-1639446460076.xml" value="0.30808080808080807" />
+        <entry key="../../../../../../../layout/compose-model-1639447332412.xml" value="0.30934343434343436" />
+        <entry key="../../../../../../../layout/compose-model-1639470468200.xml" value="0.29713804713804715" />
+        <entry key="../../../../../../../layout/compose-model-1639471435087.xml" value="0.29797979797979796" />
+        <entry key="app/src/main/res/drawable/ic_like.xml" value="0.309" />
+        <entry key="app/src/main/res/drawable/ic_like_not.xml" value="0.309" />
+        <entry key="app/src/main/res/drawable/ic_to_hide_password_24dp.xml" value="0.309" />
+        <entry key="app/src/main/res/drawable/ic_to_show_password_24dp.xml" value="0.309" />
+        <entry key="app/src/main/res/drawable/password_eye.xml" value="0.309" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

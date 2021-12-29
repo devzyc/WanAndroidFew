@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="exclude_root_build_dot_gradle" pattern="file[wan_compose.app]:*/&amp;&amp;!file[wan_compose]:build.gradle" />
+</component>
