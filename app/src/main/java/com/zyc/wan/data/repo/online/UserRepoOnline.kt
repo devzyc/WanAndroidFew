@@ -20,8 +20,8 @@ class UserRepoOnline(private val webApi: WebApi) : UserRepo {
             emit(try {
                 webApi.login(userName, password)
                     .run { Either.Right(this) }
-            } catch (e: Exception) {
-                Either.Left(AppError.GenericError(e.message ?: "empty error message"))
+            } catch (e: AppError) {
+                Either.Left(e)
             })
         }.flowOn(Dispatchers.IO)
     }

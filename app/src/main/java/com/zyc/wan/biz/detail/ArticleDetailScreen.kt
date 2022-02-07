@@ -19,7 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.navigation.NavController
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.zyc.wan.ui.theme.cyan500
 import kotlinx.coroutines.launch
 
@@ -29,10 +30,11 @@ import kotlinx.coroutines.launch
 const val TAG = "ArticleDetailScreen"
 
 @ExperimentalComposeUiApi
+@Destination
 @Composable
 fun ArticleDetailScreen(
-    navController: NavController,
-    url: String
+    url: String,
+    navigator: DestinationsNavigator,
 ) {
     var progress by remember { mutableStateOf(-1) }
     val activity = LocalContext.current as Activity
@@ -79,7 +81,7 @@ fun ArticleDetailScreen(
     }
 
     BackHandler {
-        navController.popBackStack()
+        navigator.popBackStack()
     }
 }
 

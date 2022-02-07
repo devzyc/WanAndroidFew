@@ -1,8 +1,8 @@
 package com.zyc.wan.reusable.composable
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,21 +16,6 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.abs
 import kotlin.math.max
 
-@Composable
-fun LoadingView(isShown: Boolean) {
-    if (isShown) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center),
-            )
-        }
-    }
-}
-
 val AppBarHeight = 56.dp
 val AppBarHorizontalPadding = 4.dp
 val TitleIconModifier = Modifier.fillMaxHeight()
@@ -39,13 +24,13 @@ var withoutIconWidth = 16.dp - AppBarHorizontalPadding
 
 @Composable
 fun CenterTopAppBar(
-    title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
-    backgroundColor: Color = MaterialTheme.colors.primarySurface,
+    backgroundColor: Color = colors.primarySurface,
     contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = AppBarDefaults.TopAppBarElevation
+    elevation: Dp = AppBarDefaults.TopAppBarElevation,
+    content: @Composable () -> Unit,
 ) {
     val defLeftSectionWidth = if (navigationIcon == null) withoutIconWidth else iconWidth
     var leftSectionWidth by remember { mutableStateOf(defLeftSectionWidth) }
@@ -87,7 +72,7 @@ fun CenterTopAppBar(
                 ProvideTextStyle(value = MaterialTheme.typography.h6) {
                     CompositionLocalProvider(
                         LocalContentAlpha provides ContentAlpha.high,
-                        content = title
+                        content = content
                     )
                 }
             }

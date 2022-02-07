@@ -9,5 +9,5 @@ object Def {
 
     const val PREFERENCES_NAME = "wan_pref"
 
-    const val TRANSITION_DURATION = 900
+    const val SCREEN_TRANSITION_DURATION = 900
 }

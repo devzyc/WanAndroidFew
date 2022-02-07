@@ -7,15 +7,17 @@ import com.google.gson.GsonBuilder
 import com.google.gson.internal.`$Gson$Types`
 import com.zyc.wan.Toggle
 import com.zyc.wan.data.network.deserializer.ItemsDeserializer
+import com.zyc.wan.data.network.deserializer.PagedItemsDeserializer
 import com.zyc.wan.data.network.deserializer.PojoDeserializer
 import com.zyc.wan.data.network.interceptor.HeaderInterceptor
 import com.zyc.wan.data.network.interceptor.SaveCookieInterceptor
 import com.zyc.wan.data.network.interceptor.WebErrorInterceptor
+import com.zyc.wan.data.network.response.Article
 import com.zyc.wan.data.network.response.LoginResult
 import com.zyc.wan.data.network.response.UserInfo
-import com.zyc.wan.data.network.response.WxArticle
 import com.zyc.wan.data.network.response.WxChannel
 import com.zyc.wan.definable.Url
+import com.zyc.wan.reusable.Paged
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
@@ -32,10 +34,10 @@ interface WebApi {
     suspend fun getWxChannels(): List<WxChannel>
 
     @GET("article/list/{page}/json")
-    suspend fun getWxArticles(
+    suspend fun getArticles(
         @Path("page") page: Int,
         @Query("cid") channelId: Int
-    ): List<WxArticle>
+    ): Paged<Article>
 
     @POST("lg/collect/{id}/json")
     suspend fun addFavoriteArticle(@Path("id") id: Int): Any
@@ -52,6 +54,13 @@ interface WebApi {
 
     @GET("/lg/coin/userinfo/json")
     suspend fun getUserInfo(): UserInfo
+
+    @POST("article/query/{page}/json")
+    @FormUrlEncoded
+    suspend fun searchArticles(
+        @Path("page") page: Int,
+        @Field("k") key: String
+    ): Paged<Article>
 
     companion object {
 
@@ -76,16 +85,26 @@ interface WebApi {
         private fun gson(): Gson {
             return GsonBuilder()
                 .run {
-                    listOf<Class<*>>(LoginResult::class.java)
-                        .forEach {
-                            registerTypeAdapter(typeOf(it), PojoDeserializer<Any>())
-                        }
+                    listOf<Class<*>>(
+                        LoginResult::class.java, UserInfo::class.java,
+                    ).forEach {
+                        registerTypeAdapter(typeOf(it), PojoDeserializer<Any>())
+                    }
+
+                    listOf<Class<*>>(
+                        Article::class.java,
+                    ).map {
+                        combinedTypeOf(Paged::class.java, it)
+                    }.forEach {
+                        registerTypeAdapter(it, PagedItemsDeserializer<Any>())
+                    }
+
                     listOf<Pair<Class<*>, String>>(
                         Pair(WxChannel::class.java, ""),
-                        Pair(WxArticle::class.java, "datas"),
                     ).forEach {
-                        registerListTypeAdapter(it.first, it.second, this)
+                        registerListTypeAdapter(itemClass = it.first, listKey = it.second, gsonBuilder = this)
                     }
+
                     create()
                 }
         }
@@ -96,7 +115,7 @@ interface WebApi {
             gsonBuilder: GsonBuilder
         ) {
             gsonBuilder.registerTypeAdapter(
-                typeFor(MutableList::class.java, itemClass),
+                combinedTypeOf(MutableList::class.java, itemClass),
                 ItemsDeserializer<Any>(listKey)
             )
         }
@@ -108,7 +127,7 @@ fun <T> typeOf(clazz: Class<T>): Type {
     return TypeToken.of(clazz).type
 }
 
-fun typeFor(
+fun combinedTypeOf(
     typeOfTemplate: Type,
     typeOfTemplateArg: Type
 ): ParameterizedType {

@@ -17,9 +17,11 @@
 package com.zyc.wan.data
 
 import android.content.Context
+import com.zyc.wan.biz.home.wx.WxListsViewModel
+import com.zyc.wan.biz.search.SearchViewModel
 import com.zyc.wan.data.network.WebApi
 import com.zyc.wan.data.repo.UserRepo
-import com.zyc.wan.data.repo.WxListsRepo
+import com.zyc.wan.data.repo.online.SearchRepoOnline
 import com.zyc.wan.data.repo.online.UserRepoOnline
 import com.zyc.wan.data.repo.online.WxListsRepoOnline
 
@@ -27,8 +29,9 @@ import com.zyc.wan.data.repo.online.WxListsRepoOnline
  * Dependency Injection container at the application level.
  */
 interface AppContainer {
-    val wxListsRepo: WxListsRepo
     val userRepo: UserRepo
+    var wxListsViewModel: WxListsViewModel
+    var searchViewModel: SearchViewModel
 }
 
 /**
@@ -38,11 +41,23 @@ interface AppContainer {
  */
 class AppContainerImpl(private val applicationContext: Context) : AppContainer {
 
-    override val wxListsRepo: WxListsRepo by lazy {
-        WxListsRepoOnline(WebApi.create())
-    }
+    private var _wxListsViewModel: WxListsViewModel = WxListsViewModel(WxListsRepoOnline(WebApi.create()))
+
+    private var _searchViewModel: SearchViewModel = SearchViewModel(SearchRepoOnline(WebApi.create()))
 
     override val userRepo: UserRepo by lazy {
         UserRepoOnline(WebApi.create())
     }
+
+    override var wxListsViewModel: WxListsViewModel
+        get() = _wxListsViewModel
+        set(value) {
+            _wxListsViewModel = value
+        }
+
+    override var searchViewModel: SearchViewModel
+        get() = _searchViewModel
+        set(value) {
+            _searchViewModel = value
+        }
 }

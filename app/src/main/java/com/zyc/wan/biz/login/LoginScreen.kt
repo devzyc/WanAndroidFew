@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
@@ -13,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -24,13 +24,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.edit
-import androidx.navigation.NavController
 import arrow.core.Either
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.zyc.wan.*
 import com.zyc.wan.R
-import com.zyc.wan.definable.Route
+import com.zyc.wan.biz.destinations.WxListsScreenDestination
+import com.zyc.wan.data.network.AppError
 import com.zyc.wan.reusable.composable.CenterTopAppBar
-import com.zyc.wan.reusable.composable.LoadingView
+import com.zyc.wan.reusable.composable.Loading
 import com.zyc.wan.reusable.nameOfCallerFunction
 import com.zyc.wan.reusable.toast
 import com.zyc.wan.ui.theme.cyan500
@@ -42,32 +44,32 @@ import kotlinx.coroutines.launch
  * @author devzyc
  */
 @ExperimentalComposeUiApi
+@Destination
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    navController: NavController,
+    navigator: DestinationsNavigator,
 ) {
     val tag = nameOfCallerFunction()
     Scaffold(
         topBar = {
             CenterTopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.user_login),
-                        color = Color.White,
-                    )
-                },
-                backgroundColor = MaterialTheme.colors.primary,
+                backgroundColor = colors.primary,
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { navigator.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "go back",
-                            tint = Color.White,
+                            tint = colors.onPrimary,
                         )
                     }
                 }
-            )
+            ) {
+                Text(
+                    text = stringResource(R.string.user_login),
+                    color = colors.onPrimary,
+                )
+            }
         }
     ) {
         Box {
@@ -105,8 +107,12 @@ fun LoginScreen(
                             .collect {
                                 when (it) {
                                     is Either.Left -> {
-                                        context.toast(R.string.login_failed)
-                                        Log.e(tag, "call login api encountered an exception, detail: ${it.value.message}")
+                                        if (it.value is AppError.BusinessError) {
+                                            context.toast(it.value.message!!)
+                                        } else {
+                                            context.toast(R.string.login_failed)
+                                            Log.e(tag, "call login api encountered an exception, detail: ${it.value.message}")
+                                        }
                                     }
                                     is Either.Right -> {
                                         context.dataStore.edit {
@@ -115,7 +121,7 @@ fun LoginScreen(
                                             prefPassword = password
                                         }
                                         context.toast(R.string.login_success)
-                                        navController.navigate(Route.WX_LISTS)
+                                        navigator.navigate(WxListsScreenDestination)
                                     }
                                 }
                                 isLoading = false
@@ -162,12 +168,12 @@ fun LoginScreen(
                     Text(
                         text = stringResource(R.string.login),
                         modifier = Modifier.padding(8.dp),
-                        color = Color.White,
+                        color = colors.onPrimary,
                         fontSize = 17.sp,
                     )
                 }
             }
-            LoadingView(isShown = isLoading)
+            Loading(isShown = isLoading)
         }
     }
 }
