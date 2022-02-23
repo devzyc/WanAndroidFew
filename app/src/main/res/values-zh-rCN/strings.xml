@@ -2,7 +2,7 @@
     <string name="app_name">玩Android</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="home">首页</string>
+    <string name="tab_one">首页</string>
     <string name="knowledge_system">体系</string>
     <string name="navigation">导航</string>
     <string name="project">项目</string>

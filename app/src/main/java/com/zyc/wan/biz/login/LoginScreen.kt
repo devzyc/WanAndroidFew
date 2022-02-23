@@ -24,17 +24,17 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.edit
+import androidx.hilt.navigation.compose.hiltViewModel
 import arrow.core.Either
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.zyc.wan.*
 import com.zyc.wan.R
-import com.zyc.wan.biz.destinations.WxListsScreenDestination
-import com.zyc.wan.data.network.AppError
+import com.zyc.wan.ui.DefaultTransitions
+import com.zyc.wan.biz.destinations.LoginScreenDestination
+import com.zyc.wan.data.remote.AppError
 import com.zyc.wan.reusable.composable.CenterTopAppBar
 import com.zyc.wan.reusable.composable.Loading
-import com.zyc.wan.reusable.nameOfCallerFunction
-import com.zyc.wan.reusable.toast
+import com.zyc.wan.reusable.extension.toast
 import com.zyc.wan.ui.theme.cyan500
 import com.zyc.wan.ui.theme.grey500
 import kotlinx.coroutines.flow.collect
@@ -43,20 +43,36 @@ import kotlinx.coroutines.launch
 /**
  * @author devzyc
  */
-@ExperimentalComposeUiApi
-@Destination
+@OptIn(ExperimentalComposeUiApi::class)
+@Destination(
+    start = true,
+    style = DefaultTransitions::class
+)
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel,
-    navigator: DestinationsNavigator,
+    onBack: () -> Unit,
+    onLoginSuccess: () -> Unit,
 ) {
-    val tag = nameOfCallerFunction()
+    LoginScreen(
+        viewModel = hiltViewModel(),
+        onBack = onBack,
+        onLoginSuccess = onLoginSuccess
+    )
+}
+
+@ExperimentalComposeUiApi
+@Composable
+internal fun LoginScreen(
+    viewModel: LoginViewModel,
+    onBack: () -> Unit,
+    onLoginSuccess: () -> Unit,
+) {
     Scaffold(
         topBar = {
             CenterTopAppBar(
                 backgroundColor = colors.primary,
                 navigationIcon = {
-                    IconButton(onClick = { navigator.popBackStack() }) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "go back",
@@ -70,7 +86,7 @@ fun LoginScreen(
                     color = colors.onPrimary,
                 )
             }
-        }
+        },
     ) {
         Box {
             var isLoading by remember { mutableStateOf(false) }
@@ -111,7 +127,10 @@ fun LoginScreen(
                                             context.toast(it.value.message!!)
                                         } else {
                                             context.toast(R.string.login_failed)
-                                            Log.e(tag, "call login api encountered an exception, detail: ${it.value.message}")
+                                            Log.e(
+                                                LoginScreenDestination.route,
+                                                "call login api encountered an exception, detail: ${it.value.message}"
+                                            )
                                         }
                                     }
                                     is Either.Right -> {
@@ -121,7 +140,7 @@ fun LoginScreen(
                                             prefPassword = password
                                         }
                                         context.toast(R.string.login_success)
-                                        navigator.navigate(WxListsScreenDestination)
+                                        onLoginSuccess()
                                     }
                                 }
                                 isLoading = false
@@ -209,5 +228,7 @@ fun LoginField(
         keyboardActions = keyboardActions,
         visualTransformation = visualTransformation,
         trailingIcon = trailingIcon,
+        singleLine = true,
+        maxLines = 1,
     )
 }

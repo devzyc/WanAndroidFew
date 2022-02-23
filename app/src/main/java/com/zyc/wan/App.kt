@@ -4,26 +4,46 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
-import com.zyc.wan.data.AppContainer
-import com.zyc.wan.data.AppContainerImpl
-import com.zyc.wan.data.network.response.UserInfo
+import com.zyc.wan.biz.home.wx.WxListsViewModel
+import com.zyc.wan.biz.search.SearchViewModel
+import com.zyc.wan.data.repo.SearchRepo
+import com.zyc.wan.data.repo.WxListsRepo
 import com.zyc.wan.definable.Constant
 import com.zyc.wan.definable.Def
+import com.zyc.wan.di.NetworkModule
 import com.zyc.wan.reusable.Preference
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
 class App : Application() {
 
-    // AppContainer instance used by the rest of classes to obtain dependencies
-    lateinit var container: AppContainer
+    lateinit var wxListsViewModel: WxListsViewModel
+    lateinit var searchViewModel: SearchViewModel
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate() {
         instance = this
-        container = AppContainerImpl(this)
+        wxListsViewModel = WxListsViewModel(
+            WxListsRepo(
+                NetworkModule.provideWebApi(
+                    NetworkModule.provideRetrofit(
+                        NetworkModule.provideOkHttpClient()
+                    )
+                )
+            )
+        )
+        searchViewModel = SearchViewModel(
+            SearchRepo(
+                NetworkModule.provideWebApi(
+                    NetworkModule.provideRetrofit(
+                        NetworkModule.provideOkHttpClient()
+                    )
+                )
+            )
+        )
     }
 
     companion object {
-        var userInfo: UserInfo? = null
         lateinit var instance: App
     }
 }

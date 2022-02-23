@@ -5,6 +5,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import com.zyc.wan.R
 
@@ -14,13 +15,14 @@ fun WanTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() 
         darkColors(
             primary = Purple200,
             primaryVariant = Pink700,
-            secondary = Teal200
+            secondary = Teal200,
         )
     } else {
         lightColors(
             primary = colorResource(R.color.primary_light),
             primaryVariant = Pink700,
-            secondary = Teal200
+            secondary = Teal200,
+            onSecondary = Color.LightGray,
         )
     }
 

@@ -20,21 +20,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.zyc.wan.ui.DefaultTransitions
+import com.zyc.wan.biz.destinations.ArticleDetailScreenDestination
 import com.zyc.wan.ui.theme.cyan500
 import kotlinx.coroutines.launch
 
 /**
  * @author devzyc
  */
-const val TAG = "ArticleDetailScreen"
-
 @ExperimentalComposeUiApi
-@Destination
+@Destination(style = DefaultTransitions::class)
 @Composable
 fun ArticleDetailScreen(
     url: String,
-    navigator: DestinationsNavigator,
+    onBack: () -> Unit,
 ) {
     var progress by remember { mutableStateOf(-1) }
     val activity = LocalContext.current as Activity
@@ -81,10 +80,11 @@ fun ArticleDetailScreen(
     }
 
     BackHandler {
-        navigator.popBackStack()
+        onBack()
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CustomWebView(
     url: String,
@@ -94,7 +94,7 @@ fun CustomWebView(
     onBack: (webView: WebView?) -> Unit,
     onReceivedError: (error: WebResourceError?) -> Unit = {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Log.d(TAG, "CustomWebView encountered an error: ${it?.description}")
+            Log.d(ArticleDetailScreenDestination.route, "CustomWebView encountered an error: ${it?.description}")
         }
     }
 ) {
@@ -141,7 +141,7 @@ fun CustomWebView(
                     return true
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "shouldOverrideUrlLoading: $e")
+                Log.e(ArticleDetailScreenDestination.route, "shouldOverrideUrlLoading: $e")
                 return true
             }
             return super.shouldOverrideUrlLoading(view, request)

@@ -2,7 +2,7 @@
     <string name="app_name">wan compose</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="home">Home</string>
+    <string name="tab_one">Home</string>
     <string name="knowledge_system">System</string>
     <string name="navigation">Navigation</string>
     <string name="project">Project</string>

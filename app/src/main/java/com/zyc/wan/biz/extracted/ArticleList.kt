@@ -31,14 +31,12 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.zyc.wan.R
-import com.zyc.wan.biz.destinations.ArticleDetailScreenDestination
-import com.zyc.wan.biz.destinations.LoginScreenDestination
-import com.zyc.wan.data.network.response.Article
+import com.zyc.wan.data.model.Article
 import com.zyc.wan.prefIsLogin
 import com.zyc.wan.reusable.composable.GotoTop
-import com.zyc.wan.reusable.toast
+import com.zyc.wan.reusable.extension.toast
+import com.zyc.wan.reusable.extension.translateHtmlContent
 import com.zyc.wan.ui.theme.grey300
 import com.zyc.wan.ui.theme.grey500
 import kotlinx.coroutines.flow.collect
@@ -49,7 +47,8 @@ import kotlinx.coroutines.launch
 fun ArticleList(
     pagingItems: LazyPagingItems<Article>,
     onRefresh: () -> Unit,
-    navigator: DestinationsNavigator,
+    onFavoriteButtonClick: () -> Unit,
+    onItemClick: (String) -> Unit,
     favoriteMap: SnapshotStateMap<Int, Boolean>,
     favoriteViewModel: FavoriteViewModel,
     listState: LazyListState = rememberLazyListState()
@@ -79,11 +78,11 @@ fun ArticleList(
                     item,
                     favoriteMap,
                     onClick = {
-                        navigator.navigate(ArticleDetailScreenDestination(url = item.link))
+                        onItemClick(item.link)
                     },
                     onFavoriteClick = {
                         if (!prefIsLogin) {
-                            navigator.navigate(LoginScreenDestination)
+                            onFavoriteButtonClick()
                             return@ArticleItem
                         }
                         scope.launch {
@@ -144,7 +143,7 @@ fun ArticleItem(
             .clickable(onClick = onClick),
     ) {
         Text(
-            text = article.title,
+            text = article.title.translateHtmlContent(),
             modifier = Modifier.fillMaxWidth(),
             color = Color(0xff19191B),
             fontSize = 16.sp,

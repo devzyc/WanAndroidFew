@@ -10,4 +10,6 @@ object Def {
     const val PREFERENCES_NAME = "wan_pref"
 
     const val SCREEN_TRANSITION_DURATION = 900
+
+    const val GRAPH_HOME = "home"
 }

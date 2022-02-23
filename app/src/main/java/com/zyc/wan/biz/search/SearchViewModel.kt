@@ -9,16 +9,21 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.zyc.wan.biz.extracted.FavoriteViewModel
-import com.zyc.wan.data.network.response.Article
+import com.zyc.wan.data.model.Article
 import com.zyc.wan.data.repo.SearchRepo
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class SearchViewModel(private val searchRepo: SearchRepo) : FavoriteViewModel(searchRepo) {
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+    private val searchRepo: SearchRepo
+) : FavoriteViewModel(searchRepo) {
 
     val favoriteMap = mutableStateMapOf<Int, Boolean>()
 
-    val searchContent = mutableStateOf("")
+    var searchContent by mutableStateOf("")
 
     val listState by mutableStateOf(LazyListState())
 
@@ -26,7 +31,8 @@ class SearchViewModel(private val searchRepo: SearchRepo) : FavoriteViewModel(se
         flow { PagingData.empty<PagingData<Article>>() }
     )
 
-    fun searchArticlePagingData(key: String) {
-        searchedPagingFlow = searchRepo.searchArticlePagingData(key).cachedIn(viewModelScope)
+    fun searchArticlePagingData() {
+        searchedPagingFlow = searchRepo.searchArticlePagingData(searchContent)
+            .cachedIn(viewModelScope)
     }
 }

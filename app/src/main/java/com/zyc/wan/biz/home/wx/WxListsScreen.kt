@@ -26,11 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.*
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.zyc.wan.R
-import com.zyc.wan.biz.destinations.SearchScreenDestination
+import com.zyc.wan.ui.DefaultTransitions
 import com.zyc.wan.biz.extracted.ArticleList
-import com.zyc.wan.data.network.response.WxChannel
+import com.zyc.wan.data.model.WxChannel
+import com.zyc.wan.definable.Def
 import kotlinx.coroutines.launch
 
 /**
@@ -38,11 +38,17 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalPagerApi::class)
 @ExperimentalComposeUiApi
-@Destination(start = true)
+@Destination(
+    navGraph = Def.GRAPH_HOME,
+    route= "${Def.GRAPH_HOME}/wx_lists",
+    style = DefaultTransitions::class,
+)
 @Composable
 fun WxListsScreen(
     viewModel: WxListsViewModel,
-    navigator: DestinationsNavigator,
+    onSearchClick: () -> Unit,
+    onFavoriteButtonClick: () -> Unit,
+    onItemClick: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -53,7 +59,7 @@ fun WxListsScreen(
                 .background(color = colors.primary),
             contentAlignment = Alignment.CenterEnd,
         ) {
-            IconButton(onClick = { navigator.navigate(SearchScreenDestination) }) {
+            IconButton(onClick = onSearchClick) {
                 Icon(
                     imageVector = Icons.Filled.Search,
                     contentDescription = "search",
@@ -61,6 +67,7 @@ fun WxListsScreen(
                 )
             }
         }
+
         val channels by remember { viewModel.channels }
         if (channels.isEmpty()) {
             Box(
@@ -74,7 +81,7 @@ fun WxListsScreen(
                 val pagerState = rememberPagerState()
 
                 Tabs(pagerState, channels)
-                PagerBody(pagerState, channels, viewModel, navigator)
+                PagerBody(pagerState, channels, viewModel, onFavoriteButtonClick, onItemClick)
             }
         }
     }
@@ -108,7 +115,7 @@ fun Tabs(
                 text = {
                     Text(
                         text = wxChannel.name,
-                        color = if (pagerState.currentPage == index) colors.onPrimary else Color.LightGray,
+                        color = if (pagerState.currentPage == index) colors.onPrimary else colors.onSecondary,
                     )
                 },
                 selected = pagerState.currentPage == index,
@@ -129,7 +136,8 @@ fun PagerBody(
     pagerState: PagerState,
     channels: List<WxChannel>,
     viewModel: WxListsViewModel,
-    navigator: DestinationsNavigator,
+    onFavoriteButtonClick: () -> Unit,
+    onItemClick: (String) -> Unit,
 ) {
     HorizontalPager(
         count = channels.size,
@@ -144,7 +152,8 @@ fun PagerBody(
             onRefresh = {
                 viewModel.pagingFlowMap.remove(channelId)
             },
-            navigator,
+            onFavoriteButtonClick = onFavoriteButtonClick,
+            onItemClick = onItemClick,
             favoriteMap = viewModel.favoriteStore[channelId]!!,
             favoriteViewModel = viewModel,
             listState = if (pagingItems.itemCount > 0) listState.value else LazyListState(),

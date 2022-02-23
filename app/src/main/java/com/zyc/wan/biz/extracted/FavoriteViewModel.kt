@@ -2,8 +2,8 @@ package com.zyc.wan.biz.extracted
 
 import androidx.lifecycle.ViewModel
 import arrow.core.Either
-import com.zyc.wan.data.network.AppError
-import com.zyc.wan.data.repo.extracted.FavoriteRepo
+import com.zyc.wan.data.remote.AppError
+import com.zyc.wan.data.repo.FavoriteRepo
 import kotlinx.coroutines.flow.Flow
 
 open class FavoriteViewModel(private val favoriteRepo: FavoriteRepo) : ViewModel() {

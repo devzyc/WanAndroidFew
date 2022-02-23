@@ -10,16 +10,21 @@ import arrow.core.Either
 import com.zyc.wan.App
 import com.zyc.wan.R
 import com.zyc.wan.biz.extracted.FavoriteViewModel
-import com.zyc.wan.data.network.AppError
-import com.zyc.wan.data.network.response.Article
-import com.zyc.wan.data.network.response.WxChannel
+import com.zyc.wan.data.model.Article
+import com.zyc.wan.data.model.WxChannel
+import com.zyc.wan.data.remote.AppError
 import com.zyc.wan.data.repo.WxListsRepo
-import com.zyc.wan.reusable.toast
+import com.zyc.wan.reusable.extension.toast
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class WxListsViewModel(private val wxListsRepo: WxListsRepo) : FavoriteViewModel(wxListsRepo) {
+@HiltViewModel
+class WxListsViewModel @Inject constructor(
+    private val wxListsRepo: WxListsRepo
+) : FavoriteViewModel(wxListsRepo) {
 
     val pagingFlowMap = mutableMapOf<Int, Flow<PagingData<Article>>>()
 
